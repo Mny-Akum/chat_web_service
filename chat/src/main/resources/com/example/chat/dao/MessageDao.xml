@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.chat.dao.MessageDao">
+
+    <sql id="select_message">
+        SELECT * FROM (
+        SELECT * FROM message_table ORDER BY id DESC
+        ) AS order_table
+        <where>
+#             查询群组消息
+            <if test="message.from_user != null and message.to_user != null and message.type == 'group' ">
+                to_user = #{message.to_user}
+            </if>
+#             查询给别人发的消息
+            <if test="message.from_user != message.to_user and message.from_user != null and message.to_user != null and message.type == 'single' ">
+                from_user IN(#{message.from_user},#{message.to_user})
+                AND to_user IN(#{message.from_user},#{message.to_user})
+                AND from_user != to_user
+            </if>
+#             查询自己给自己发的消息
+            <if test="message.from_user != null and message.from_user == message.to_user and message.type == 'single'">
+                from_user IN(#{message.from_user},#{message.to_user})
+                AND to_user IN(#{message.from_user},#{message.to_user})
+                AND #{message.from_user} = #{message.to_user}
+            </if>
+            <if test="message.message != null">
+                <trim prefix="AND">
+                    message LIKE CONCAT( '%',#{message.message},'%')
+                </trim>
+            </if>
+            <if test="message.send_time != null ">
+                <trim prefix="AND">
+                    DATE(send_time) = DATE(#{message.send_time})
+                </trim>
+            </if>
+        </where>
+    </sql>
+
+    <insert id="messageInsert">
+        INSERT INTO message_table(from_user,to_user,message,send_time,type,show_time)
+        VALUES (#{from_user},#{to_user},#{message},now(),#{type},#{show_time})
+    </insert>
+    <select id="messageSelect" resultType="com.example.chat.pojo.Message">
+        <include refid="select_message"/>
+        LIMIT #{pageStart},#{pageSize}
+    </select>
+    <select id="messageSelectAll" resultType="com.example.chat.pojo.Message">
+        <include refid="select_message"/>
+    </select>
+</mapper>

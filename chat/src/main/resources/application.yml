@@ -1,0 +1,24 @@
+http:
+  port: 5000
+spring:
+  application:
+      name: chat
+  datasource:
+      url: jdbc:mysql://localhost:3306/chat
+      username: root
+      password: root
+  servlet:
+    multipart:
+      max-file-size: 1000MB
+      max-request-size: 1000MB
+server:
+  port: 5001
+  ssl:
+      key-store: chat/chat.keystore
+      key-store-password: your_keystore_password
+      key-alias: chat_web
+      key-password: your_key_password
+      key-store-type: JKS
+store:
+  file: F:\\fileStore\\file
+  image: F:\\fileStore\\image

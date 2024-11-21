@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.chat.dao.FileUploadDao">
+
+    <insert id="addFiles" parameterType="list">
+        INSERT INTO file_table(file_size,file_name,upload_time,type,uuid,from_user,to_user) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.fileSize},#{item.fileName},#{item.uploadTime},#{item.type},#{item.uuid},#{item.fromUser},#{item.toUser})
+        </foreach>
+    </insert>
+    <insert id="addFile">
+        INSERT INTO file_table(file_size,file_name,upload_time,type,uuid,from_user,to_user) VALUES
+            (#{fileSize},#{fileName},#{uploadTime},#{type},#{uuid},#{fromUser},#{toUser})
+    </insert>
+    <select id="getFileName" resultType="java.lang.String">
+        SELECT (file_name) FROM file_table WHERE uuid = #{uuid} AND type = #{type};
+    </select>
+</mapper>
